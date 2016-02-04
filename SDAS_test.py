@@ -3,9 +3,10 @@ from sdas.core.LoadSdasData import LoadSdasData
 from sdas.core.StartSdas import StartSdas
 import numpy
 import sys
-from special_mean_val import special_mean_val
-from exposure_time import exposure_time
-from period_counter import period_counter
+from pyISTTOK.special_mean_val import special_mean_val
+from pyISTTOK.exposure_time import exposure_time
+from pyISTTOK.period_counter import period_counter
+#import pyISTTOK as i
 import xmlrpclib
 
 #####################################################################
