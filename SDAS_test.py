@@ -59,7 +59,7 @@ print 'Data loaded\n'
 if iplasma_ok:
     print 'FROM IPLASMA   ( thresh',iplasma_threshold,')'
     exposure_time(numpy.abs(iplasma),iplasma_times,iplasma_threshold)
-    print 'Mean current {0:.3f} kA'.format(special_mean_val(numpy.abs(iplasma),iplasma_threshold)/1e3)
+    print 'Mean current {0:.3f} kA'.format(special_mean_val(numpy.abs(iplasma),iplasma_threshold)/1.e3)
     iplasma_periods = period_counter(numpy.abs(iplasma),iplasma_threshold)
     print 'I counted '+str(iplasma_periods)+' periods'
 else:
