@@ -8,22 +8,27 @@ from pyISTTOK.exposure_time import exposure_time
 from pyISTTOK.period_counter import period_counter
 import xmlrpclib
 
-# #####################################################################
-# ##                  GLOBAL VARIABLES                               ##
-# #####################################################################
-# iplasma_threshold=1.e3
-# dens_threshold=2.e18
-# marte_threshold=10
-# iplasma_ok=1
-# dens_ok=1
-# marte_ok=1
-# #####################################################################
+#####################################################################
+##                  GLOBAL VARIABLES                               ##
+#####################################################################
+iplasma_threshold=0.5e3
+dens_threshold=1.e18
+marte_threshold=100
+#####################################################################
+
 
 def get_shot_report(*argv):
 
+    #####################################################################
+    ##                  IMPORTAN FLAGS                                 ##
+    #####################################################################
+    iplasma_ok=0
+    dens_ok=0
+    marte_ok=0
+
     client = StartSdas()
 
-    if len(argv) < 2 :
+    if len(argv) < 1 :
         shotnr = client.searchMaxEventNumber('0x0000')
     else :
         shotnr = int(argv[-1])
@@ -65,7 +70,7 @@ def get_shot_report(*argv):
         iplasma_mean_val = special_mean_val(numpy.abs(iplasma),iplasma_threshold)/1.e3
         print 'Mean current {0:.3f} kA'.format(iplasma_mean_val)
         iplasma_periods = period_counter(numpy.abs(iplasma),iplasma_threshold)
-        print 'I counted '+str(iplasma_periods)+' periods ('+str(int((iplasma_shot_time)//25))+' ms)'
+        print 'I counted '+str(iplasma_periods)+' periods ('+str(int((iplasma_shot_time)//25))+')'
     else:
         print 'NO IPLASMA DATA'
 
@@ -78,7 +83,7 @@ def get_shot_report(*argv):
         dens_mean_val = special_mean_val(dens,dens_threshold)/1e18;
         print 'Mean density {0:.2e} m'.format(dens_mean_val*1e18)+u'\u207b\u00b3'
         dens_periods = period_counter(dens,dens_threshold)
-        print 'I counted '+str(dens_periods)+' periods ('+str(int((dens_shot_time)//25))+' ms)'
+        print 'I counted '+str(dens_periods)+' periods ('+str(int((dens_shot_time)//25))+')'
     else:
         print 'NO DENSITY DATA'
 
@@ -100,4 +105,11 @@ def get_shot_report(*argv):
 
     print '\n'
 
-return iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods;
+    return iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods;
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2 :
+        get_shot_report()
+    else :
+        get_shot_report(int(sys.argv[-1]))
