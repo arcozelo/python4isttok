@@ -17,13 +17,17 @@ import time
 #####################################################################
 
 if len(sys.argv) < 2 :
-    [iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods] = get_shot_report()
+    relevant_data = get_shot_report()
 else :
-    [iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods] = get_shot_report(int(sys.argv[-1]))
+    relevant_data = get_shot_report(int(sys.argv[-1]))
 
+if relevant_data == -1:
+    exit()
 
-raw_input("Press Enter to continue into the auto filler...")
+[shotnr,iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods] = relevant_data;
 
+inputy = raw_input("Press Enter to continue into the auto filler...")
+if inputy !='' : exit()
 #####################################################################
 ##                  AUTO FILLER                                    ##
 #####################################################################
@@ -50,6 +54,7 @@ for i in range(timer_max):
 
 if mouse_ready:
     print "I'm going to click at"+str(curr_posi)
+    m.click(m.position()[0],m.position()[1])
     m.click(m.position()[0],m.position()[1])
 
     # Shot number

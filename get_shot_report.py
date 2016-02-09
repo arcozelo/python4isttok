@@ -3,6 +3,7 @@ from sdas.core.LoadSdasData import LoadSdasData
 from sdas.core.StartSdas import StartSdas
 import numpy
 import sys
+import time
 from pyISTTOK.special_mean_val import special_mean_val
 from pyISTTOK.exposure_time import exposure_time
 from pyISTTOK.period_counter import period_counter
@@ -26,6 +27,12 @@ def get_shot_report(*argv):
     dens_ok=0
     marte_ok=0
 
+    #####################################################################
+    ##                  VARIABLES                                      ##
+    #####################################################################
+    waited_time = 0
+    fluffytron={0: "|", 1: "/", 2: "-", 3: "\\"}
+
     client = StartSdas()
 
     if len(argv) < 1 :
@@ -38,29 +45,47 @@ def get_shot_report(*argv):
     marte_power_channelID='MARTE_NODE_IVO3.DataCollection.Channel_105'; #Marte channel for the power supply
 
     print '\nSHOT #'+str(shotnr)+'\n'
-    print 'Loading data'
+    print '\nLoading data, CTRL-C to interrupt'
+    while(True):
+        if iplasma_ok==0:
+            try:
+                [iplasma,iplasma_times] = LoadSdasData(client, plasma_curr_channelID, shotnr);
+                iplasma_ok=numpy.all(numpy.isfinite(iplasma))
+            except xmlrpclib.Fault:
+                iplasma_ok=0
+        if dens_ok ==0:
+            try:
+                [dens,dens_times] = LoadSdasData(client, plasma_dens_channelID, shotnr);
+                dens_ok=numpy.all(numpy.isfinite(dens))  # check if all finite
+            except xmlrpclib.Fault:
+                dens_ok=0
+        if marte_ok==0:
+            try:
+                [marte,marte_times] = LoadSdasData(client, marte_power_channelID, shotnr);
+                marte_ok=numpy.all(numpy.isfinite(marte))  # check if all finite
+            except xmlrpclib.Fault:
+                marte_ok=0
+        if dens_ok and iplasma_ok and marte_ok :
+            print '\nData loaded\n'
+            break
 
-    try:
-        [iplasma,iplasma_times] = LoadSdasData(client, plasma_curr_channelID, shotnr);
-        iplasma_ok=numpy.all(numpy.isfinite(iplasma))
-    except xmlrpclib.Fault:
-        print 'PLASMA CURRENT DATA NOT READY'
-        iplasma_ok=0
-    try:
-        [dens,dens_times] =       LoadSdasData(client, plasma_dens_channelID, shotnr);
-        dens_ok=numpy.all(numpy.isfinite(dens))  # check if all finite
-    except xmlrpclib.Fault:
-        print 'DENSITY DATA NOT READY'
-        dens_ok=0
-    try:
-        [marte,marte_times] =       LoadSdasData(client, marte_power_channelID, shotnr);
-        marte_ok=numpy.all(numpy.isfinite(marte))  # check if all finite
-    except xmlrpclib.Fault:
-        print 'MARTE CONTROL DATA NOT READY'
-        marte_ok=0
-
-
-    print 'Data loaded\n'
+        try:
+        	print fluffytron[waited_time % 4]+' '+'{0:02d}'.format(waited_time)+'s',
+        	print ' PLASMA CURRENT DATA:',
+        	if iplasma_ok : print 'READY',
+        	else : print 'NOT READY',
+        	print ' DENSITY DATA:',
+        	if dens_ok : print 'READY',
+        	else : print 'NOT READY',
+        	print ' MARTE CONTROL:',
+        	if marte_ok : print 'READY',
+        	else : print 'NOT READY',
+        	print '  \r',
+        	sys.stdout.flush()
+        	time.sleep(1)
+        	waited_time += 1
+        except KeyboardInterrupt:
+            return -1;
 
 
     if iplasma_ok:
@@ -105,7 +130,7 @@ def get_shot_report(*argv):
 
     print '\n'
 
-    return iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods;
+    return shotnr,iplasma_mean_val,dens_mean_val,iplasma_shot_time,iplasma_periods,marte_periods;
 
 
 if __name__ == '__main__':
