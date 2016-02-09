@@ -55,7 +55,7 @@ for i in range(timer_max):
 if mouse_ready:
     print "I'm going to click at"+str(curr_posi)
     m.click(m.position()[0],m.position()[1])
-    m.click(m.position()[0],m.position()[1])
+    time.sleep(0.5)
 
     # Shot number
     k.type_string(str(shotnr))
@@ -67,7 +67,7 @@ if mouse_ready:
     k.type_string('{0:.2f}'.format(dens_mean_val))
     k.tap_key(k.tab_key)
     #duration in ms
-    k.type_string(str(iplasma_shot_time))
+    k.type_string(str(int((iplasma_shot_time//25)*25)))
     k.tap_key(k.tab_key)
 
     #Shot comments
