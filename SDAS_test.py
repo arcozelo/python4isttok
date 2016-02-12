@@ -11,8 +11,8 @@ import xmlrpclib
 #####################################################################
 ##                  GLOBAL VARIABLES                               ##
 #####################################################################
-iplasma_threshold=1.e3
-dens_threshold=2.e18
+iplasma_threshold=0.7e3
+dens_threshold=1.e18
 marte_threshold=10
 iplasma_ok=1
 dens_ok=1
